@@ -1,0 +1,88 @@
+name: Workflow action updater
+on:
+  push:
+    branches: [replacement-workflow-updater-01]
+    paths: [.github/workflow-updater-ready]
+permissions:
+  contents: read
+concurrency:
+  group: workflow-action-updater
+  cancel-in-progress: false
+jobs:
+  collect:
+    if: github.repository == 'mohanad-hafez/gh-aw-controller'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          path: task
+          persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: strawgate/gh-aw
+          ref: 27f07dd9efd43d19f8b0f6928285d4efd97c3b12
+          path: compiler
+          persist-credentials: false
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version-file: compiler/go.mod
+          cache: true
+      - name: Build pinned updater
+        working-directory: compiler
+        run: |
+          npm ci --prefix actions/setup/js --ignore-scripts
+          make build VERSION=27f07dd9efd43d19f8b0f6928285d4efd97c3b12
+          sha256sum gh-aw > ../task/compiler-SHA256SUMS
+      - name: Check action updates
+        working-directory: task
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/workflow_update.py ../compiler/gh-aw
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: action-update-${{ github.run_id }}
+          path: |
+            task/.action-update/result.json
+            task/.action-update/before.json
+            task/.action-update/after.json
+          include-hidden-files: true
+          retention-days: 7
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: updater-compiler
+          path: task/compiler-SHA256SUMS
+          retention-days: 7
+  publish:
+    needs: collect
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          sparse-checkout: scripts/workflow_update_publish.mjs
+          sparse-checkout-cone-mode: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: action-update-${{ github.run_id }}
+          path: .action-update
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        with:
+          retries: 0
+          script: |
+            const {publish}=await import(process.env.GITHUB_WORKSPACE+'/scripts/workflow_update_publish.mjs');
+            await publish({github,context});
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: action-update-publication
+          path: .action-update/publish.json
+          include-hidden-files: true
+          retention-days: 7
