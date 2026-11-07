@@ -1,8 +1,9 @@
 import fs from "node:fs";
-import { fetchQueue, formatNudge } from "./pr-sous-chef.mjs";
+import { fetchQueue, formatNudge, gh } from "./pr-sous-chef.mjs";
 import { runController } from "./souschef_controller.mjs";
 import { createTransport } from "./souschef_transport.mjs";
 import { publishReport } from "./souschef_report.mjs";
+import { repositoryRunAdapter } from "./souschef_prefilter_adapter.mjs";
 
 const checkpoint = (file, value) => {
   fs.writeFileSync(file + ".tmp", JSON.stringify(value, null, 2) + "\n");
@@ -21,7 +22,9 @@ try {
     const issue = await transport.read(`issues/${prNumber}`);
     Object.assign(context, { slash: true, commentId: id, prNumber, isPullRequest: !!issue.pull_request, authorAssociation: comment.author_association });
   }
-  const result = await runController(context, { ...transport, fetchQueue, formatNudge, publishReport, checkpoint: value => checkpoint("souschef-result.json", value) });
+  const adaptedApi = repositoryRunAdapter(gh);
+  const result = await runController(context, { ...transport, fetchQueue: (repo, number) => fetchQueue(repo, number, adaptedApi), formatNudge, publishReport, checkpoint: value => checkpoint("souschef-result.json", value) });
+  result.active_finisher_lookup = "Paginated repository runs filtered by original finisher path; all statuses and branches retained, unknown paths fail closed";
   if (context.slash) {
     const comments = await transport.read(`issues/${context.prNumber}/comments?per_page=100`, true);
     const marker = `<!-- souschef-ack:${context.commentId} -->`;
