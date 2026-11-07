@@ -1,0 +1,47 @@
+name: Review state
+on:
+  push:
+    branches: [checks-controller-review-01]
+    paths: [.checks/review-ready.txt]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  prepare:
+    if: github.repository == 'mohanad-hafez/gh-aw-controller'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Prepare review
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const repository='mohanad-hafez/gh-aw-controller';
+          const result={kind:'controlled_review_state',status:'started'};
+          const save=()=>fs.writeFileSync('review-state.json',JSON.stringify(result,null,2));
+          const request=async(path,method='GET',body)=>{
+            const r=await fetch('https://api.github.com/repos/'+repository+'/'+path,{method,headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(60000)});
+            if(!r.ok)throw Error('GitHub HTTP '+r.status);return r.json();
+          };
+          try{
+            const prs=await request('pulls?state=open&head=mohanad-hafez:checks-controller-review-01');
+            if(prs.length!==1||prs[0].base.ref!=='replacement-pr-maintenance-01'||prs[0].head.sha!==process.env.GITHUB_SHA)throw Error('Unexpected review target');
+            const pr=prs[0];result.pr=pr.number;result.head_sha=pr.head.sha;
+            const reviews=await request('pulls/'+pr.number+'/reviews');
+            if(reviews.some(r=>r.user.login==='github-actions[bot]'&&r.body==='Maintenance state check.'))throw Error('Review already exists; inspect rather than repeat');
+            result.status='request_started';save();
+            const review=await request('pulls/'+pr.number+'/reviews','POST',{commit_id:pr.head.sha,event:'REQUEST_CHANGES',body:'Maintenance state check.'});
+            result.review_id=review.id;result.state=review.state;result.status='response_received';save();
+            const observed=await request('pulls/'+pr.number+'/reviews/'+review.id);
+            if(observed.state!=='CHANGES_REQUESTED')throw Error('Review state readback mismatch');
+            result.status='verified_review_created';save();
+          }catch(error){result.error=error.message;result.delivery_uncertain=result.status==='request_started';save();process.exitCode=1;}
+          JS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: review-state
+          path: review-state.json
+          retention-days: 7
