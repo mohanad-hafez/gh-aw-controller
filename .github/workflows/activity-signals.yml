@@ -1,0 +1,76 @@
+name: Activity signals
+on:
+  push:
+    branches: [replacement-activity-signals-01]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: activity-signals
+  cancel-in-progress: false
+jobs:
+  scan:
+    if: github.repository == 'mohanad-hafez/gh-aw-controller'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+      actions: read
+    outputs:
+      action: ${{ steps.scan.outputs.action }}
+      issue_number: ${{ steps.scan.outputs.issue_number }}
+      issue_title: ${{ steps.scan.outputs.issue_title }}
+      issue_body: ${{ steps.scan.outputs.issue_body }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        id: scan
+        with:
+          retries: 0
+          script: |
+            const fs=require('node:fs');
+            const {default:precompute}=await import(process.env.GITHUB_WORKSPACE+'/scripts/activity_precompute.mjs');
+            const outputs={};
+            await precompute({github,context,core:{...core,setOutput:(name,value)=>{outputs[name]=value;core.setOutput(name,value);}}});
+            fs.writeFileSync('activity-scan.json',JSON.stringify({outputs,source_commit:'dd5e9cc3443e9cd44630b386a22aa55037303db1',model_calls:0},null,2));
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: activity-scan
+          path: activity-scan.json
+          retention-days: 7
+  apply:
+    needs: scan
+    if: needs.scan.outputs.action != 'none'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        env:
+          ACTIVITY_ACTION: ${{ needs.scan.outputs.action }}
+          ACTIVITY_NUMBER: ${{ needs.scan.outputs.issue_number }}
+          ACTIVITY_TITLE: ${{ needs.scan.outputs.issue_title }}
+          ACTIVITY_BODY: ${{ needs.scan.outputs.issue_body }}
+        with:
+          retries: 0
+          script: |
+            const fs=require('node:fs');
+            const {applySignals}=await import(process.env.GITHUB_WORKSPACE+'/scripts/activity_relay.mjs');
+            const outputs={action:process.env.ACTIVITY_ACTION,issue_number:process.env.ACTIVITY_NUMBER,issue_title:process.env.ACTIVITY_TITLE,issue_body:process.env.ACTIVITY_BODY};
+            await applySignals(outputs,{github,context,checkpoint:r=>fs.writeFileSync('activity-result.json',JSON.stringify(r,null,2))});
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: activity-result
+          path: activity-result.json
+          retention-days: 7
