@@ -1,0 +1,28 @@
+name: Output reference
+on:
+  push:
+    branches: [checks-outcome-reference-01]
+permissions:
+  contents: read
+  issues: read
+jobs:
+  capture:
+    if: github.repository == 'mohanad-hafez/gh-aw-controller'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        with:
+          retries: 0
+          script: |
+            const {captureReference}=await import(process.env.GITHUB_WORKSPACE+'/scripts/outcome_reference.mjs');
+            await captureReference({github,context});
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: safe-outputs-items
+          path: /tmp/outcome-reference
+          retention-days: 7

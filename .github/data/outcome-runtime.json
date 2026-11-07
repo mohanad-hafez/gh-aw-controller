@@ -1,0 +1,11 @@
+{
+  "repository": "jeevesh415/gh-aw",
+  "source_commit": "d4684156f2602cca9f23d3ae088636a9f7c77ac6",
+  "path": "actions/setup/js/evaluate_outcomes.cjs",
+  "sha256": "1fbbc2a30ea5c861ea7e1e7113cb6ff3c3a26b4ccd29dd310bd5528d2c53cfa3",
+  "bytes": 13799,
+  "dependencies": ["node:fs", "node:path", "node:child_process", "GitHub CLI"],
+  "compiled_setup": "Source lock uses local ./actions/setup from the same repository revision",
+  "telemetry_scope": "No external telemetry endpoints or credentials are configured in the experimental fork; evaluation JSONL is retained locally",
+  "source_policy_note": "Accepted/rejected are source evaluator heuristics, not independent scientific correctness labels"
+}

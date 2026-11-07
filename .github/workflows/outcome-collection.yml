@@ -1,0 +1,82 @@
+name: Outcome collection
+on:
+  push:
+    branches: [replacement-outcome-collection-01]
+    paths: [.github/outcome-collection-ready.txt]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: outcome-collection
+  cancel-in-progress: false
+jobs:
+  collect:
+    if: github.repository == 'mohanad-hafez/gh-aw-controller'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+      issues: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: /tmp/gh-aw/cache-memory/outcome-collector
+          key: outcome-collector-1fbbc2a3-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: outcome-collector-1fbbc2a3-${{ github.ref_name }}-
+      - name: Collect outcomes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/outcome_collect.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: outcome-inputs
+          path: /tmp/outcome-inputs
+          retention-days: 7
+  report:
+    needs: collect
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: outcome-inputs
+          path: /tmp/outcome-inputs
+      - name: Check report rules
+        run: node --test scripts/outcome_report.test.mjs
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        with:
+          retries: 0
+          script: |
+            const fs=require('node:fs');
+            const {buildOutcomeReport,publishOutcomeReport,parseEvaluationLines}=await import(process.env.GITHUB_WORKSPACE+'/scripts/outcome_report.mjs');
+            const summary=JSON.parse(fs.readFileSync('/tmp/outcome-inputs/outcome-summary.json','utf8'));
+            const file='/tmp/outcome-inputs/outcome-evaluations.jsonl';
+            const evaluations=fs.existsSync(file)?parseEvaluationLines(fs.readFileSync(file,'utf8')):[];
+            const plan=buildOutcomeReport(summary,evaluations);
+            await publishOutcomeReport(plan,{github,context,checkpoint:r=>fs.writeFileSync('outcome-report-result.json',JSON.stringify(r,null,2))});
+      - name: Preserve evaluated-run state
+        run: |
+          mkdir -p /tmp/gh-aw/cache-memory/outcome-collector
+          cp /tmp/outcome-inputs/seen-runs.json /tmp/gh-aw/cache-memory/outcome-collector/seen-runs.json
+      - uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: /tmp/gh-aw/cache-memory/outcome-collector
+          key: outcome-collector-1fbbc2a3-${{ github.ref_name }}-${{ github.run_id }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: outcome-report
+          path: outcome-report-result.json
+          retention-days: 7
