@@ -1,0 +1,37 @@
+name: PR maintenance
+on:
+  push:
+    branches: [replacement-pr-maintenance-01]
+  workflow_dispatch:
+    inputs:
+      comment_id:
+        description: Comment number
+        required: false
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  actions: write
+concurrency:
+  group: pr-maintenance
+  cancel-in-progress: false
+jobs:
+  maintain:
+    if: github.repository == 'mohanad-hafez/gh-aw-controller'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Maintain pull requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOUSCHEF_COMMENT_ID: ${{ inputs.comment_id }}
+        run: node scripts/souschef_live.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: maintenance
+          path: souschef-*.json
+          retention-days: 7
