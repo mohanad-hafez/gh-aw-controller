@@ -1,0 +1,19 @@
+{
+  "collector_sha256": "26dc9be6b468e39a87bdf85d63dd19cc64f4bfaa91e83df1b14b92f11b915765",
+  "source_repository": "github/gh-aw",
+  "source_commit": "fdfc5d5a0de50f21da575a48e5a459aaf17892ec",
+  "changes": [
+    {
+      "before": "    EXPORT_COUNT=$(grep -cE \"^func [A-Z]|^type [A-Z]|^var [A-Z]|^const [A-Z]\" \"$FILE\" 2>/dev/null || echo 0)",
+      "after": "    EXPORT_COUNT=$(grep -cE \"^func [A-Z]|^type [A-Z]|^var [A-Z]|^const [A-Z]\" \"$FILE\" 2>/dev/null || test \"$?\" -eq 1)"
+    },
+    {
+      "before": "    CJS_COUNT=$(grep -cE \"^module\\.exports|^exports\\.\" \"$FILE\" 2>/dev/null || echo 0)",
+      "after": "    CJS_COUNT=$(grep -cE \"^module\\.exports|^exports\\.\" \"$FILE\" 2>/dev/null || test \"$?\" -eq 1)"
+    },
+    {
+      "before": "    ESM_COUNT=$(grep -cE \"^export \" \"$FILE\" 2>/dev/null || echo 0)",
+      "after": "    ESM_COUNT=$(grep -cE \"^export \" \"$FILE\" 2>/dev/null || test \"$?\" -eq 1)"
+    }
+  ]
+}

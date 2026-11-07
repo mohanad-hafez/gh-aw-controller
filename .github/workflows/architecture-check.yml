@@ -1,0 +1,83 @@
+name: Architecture check
+on:
+  push:
+    branches: [replacement-architecture-check-01]
+    paths: [.github/architecture-check-ready]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: architecture-check
+  cancel-in-progress: false
+jobs:
+  collect:
+    permissions:
+      contents: read
+      issues: read
+    outputs:
+      skip: ${{ steps.gate.outputs.skip }}
+    if: github.repository == 'mohanad-hafez/gh-aw-controller'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        id: gate
+        with:
+          retries: 0
+          script: |
+            const fs=require('node:fs');
+            const {findExistingArchitecture}=await import(process.env.GITHUB_WORKSPACE+'/scripts/architecture_report.mjs');
+            const existing=await findExistingArchitecture({github,context});
+            fs.mkdirSync('/tmp/architecture-input',{recursive:true});
+            fs.writeFileSync('/tmp/architecture-input/gate.json',JSON.stringify({checked_at:new Date().toISOString(),skip:!!existing,existing_issue:existing?.number,url:existing?.html_url},null,2));
+            core.setOutput('skip',existing?'true':'false');
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        if: steps.gate.outputs.skip != 'true'
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Collect file metrics
+        if: steps.gate.outputs.skip != 'true'
+        run: node scripts/architecture_collect.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: architecture-input
+          path: /tmp/architecture-input/
+          retention-days: 7
+  report:
+    needs: collect
+    if: needs.collect.outputs.skip != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: architecture-input
+          path: /tmp/architecture-input
+      - name: Check report rules
+        run: node --test scripts/architecture_report.test.mjs
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        with:
+          retries: 0
+          script: |
+            const fs=require('node:fs');
+            const {publishArchitecture}=await import(process.env.GITHUB_WORKSPACE+'/scripts/architecture_report.mjs');
+            await publishArchitecture({github,context,metrics:JSON.parse(fs.readFileSync('/tmp/architecture-input/metrics.json','utf8'))});
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: architecture-report
+          path: architecture-result.json
+          retention-days: 7

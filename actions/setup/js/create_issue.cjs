@@ -1490,3 +1490,5 @@ async function main(config = {}) {
 }
 
 module.exports = { main, createIssue, createParentIssueTemplate, searchForExistingParent, getSubIssueCount, ISSUE_FIELDS_QUERY };
+
+// Repository maintenance check.
