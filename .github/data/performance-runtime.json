@@ -1,0 +1,72 @@
+{
+  "repository": "TheTechOddBug/gh-aw",
+  "commit": "856e7fa3ca4f1597f9adbd519eec415ce92320e2",
+  "files": [
+    {
+      "path": ".github/workflows/shared/daily-audit-discussion.md",
+      "file": "daily-audit-discussion.md",
+      "sha256": "b2a95a475ad64e75499c1a54ac00f15c66cbd62e38908a6c421fe25db077d3ff"
+    },
+    {
+      "path": ".github/workflows/shared/reporting.md",
+      "file": "reporting.md",
+      "sha256": "0929890c04f04878f9750464ef9a4bc799c87d236e4f936018a3bfc2dc3aae41"
+    },
+    {
+      "path": "actions/setup/sh/clone_repo_memory_branch.sh",
+      "file": "clone_repo_memory_branch.sh",
+      "sha256": "396823e7da1aac555545826ea03d359d6332b3809bd0206fc9e9c8152adb98f3"
+    },
+    {
+      "path": "actions/setup/js/push_repo_memory.cjs",
+      "file": "push_repo_memory.cjs",
+      "sha256": "3344ee6b71b0dd1fad09f8ebd7568c7d33dd52409df30040d8d0e0990bd175fa"
+    },
+    {
+      "path": "actions/setup/js/create_issue.cjs",
+      "file": "create_issue.cjs",
+      "sha256": "ea6ca1b51681e7ea71eca77a728629d31e6a1174e11b13c9b51f3b77acfbebf9"
+    },
+    {
+      "path": "actions/setup/js/create_discussion.cjs",
+      "file": "create_discussion.cjs",
+      "sha256": "902cdaca42038556723b764553f58c5ac3a0f856982b732171dac086b8492386"
+    },
+    {
+      "path": "Makefile",
+      "file": "Makefile",
+      "sha256": "fefda0ddb603cd665e679f1e5ea1c060600bda78b261877b9600b0e0589c6655"
+    },
+    {
+      "path": "go.mod",
+      "file": "go.mod",
+      "sha256": "0852e65f34580048c4fd401078d21dd9a8d6165977c966126c9304cf84206d56"
+    },
+    {
+      "path": "go.sum",
+      "file": "go.sum",
+      "sha256": "21af8c6e6e004f0bc9c8a9b63145efb644fb189f8758d8577ebdf40a5a6c6870"
+    },
+    {
+      "path": "pkg/workflow/compiler_performance_benchmark_test.go",
+      "file": "compiler_performance_benchmark_test.go",
+      "sha256": "89c1fe4ab59a4fdb568311c0e272a0ca1d8b174357059143fa36b4b349d2cce5"
+    },
+    {
+      "path": "pkg/cli/commands_utils_test.go",
+      "file": "commands_utils_test.go",
+      "sha256": "bf5cbc0d4a13169fb340606009efc531a55127a59fa86131347ba6728b40680b"
+    },
+    {
+      "path": "daily-cli-performance.md#analyze_trends.py",
+      "file": "analyze_trends.py.gz",
+      "uncompressed_sha256": "5a5fdd983c94bef99620f60d39e6bcc9cdcac929db52a2128627416e722ff4f9"
+    }
+  ],
+  "optional_runtime_import": {
+    "path": ".github/shared-instructions.md",
+    "status": "absent_at_frozen_commit",
+    "optional": true
+  },
+  "bundle_correction": "Nested shared imports resolve from workflow import root, not shared/shared. Screening bytes and labels unchanged."
+}
