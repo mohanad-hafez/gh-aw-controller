@@ -1,0 +1,53 @@
+name: Matched activity relay
+on:
+  push:
+    branches: [matched-activity-relay-01]
+permissions:
+  contents: read
+jobs:
+  precompute:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    outputs:
+      action: ${{ steps.scan.outputs.action }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Scan the same empty activity window
+        id: scan
+        run: node .github/matched/relay-scan.mjs agent
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: relay-agent
+          path: relay-result.json
+          retention-days: 14
+  scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    outputs:
+      action: ${{ steps.scan.outputs.action }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Scan the same empty activity window
+        id: scan
+        run: node .github/matched/relay-scan.mjs script
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: relay-script
+          path: relay-result.json
+          retention-days: 14
+  original_agent:
+    needs: precompute
+    if: needs.precompute.outputs.action != 'none'
+    runs-on: ubuntu-24.04
+    steps:
+      - run: exit 1
+  script_relay:
+    needs: scan
+    if: needs.scan.outputs.action != 'none'
+    runs-on: ubuntu-24.04
+    steps:
+      - run: exit 1

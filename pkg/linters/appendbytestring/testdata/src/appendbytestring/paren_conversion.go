@@ -1,5 +1,0 @@
-package appendbytestring
-
-func badParenConversion(b []byte, s string) []byte {
-	return append(b, ([]byte(s))...) // want `append\(b, \[\]byte\(s\)\.\.\.\) can be simplified to append\(b, s\.\.\.\); the \[\]byte conversion is unnecessary`
-}

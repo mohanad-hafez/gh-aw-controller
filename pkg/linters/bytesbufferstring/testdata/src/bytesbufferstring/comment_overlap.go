@@ -1,7 +1,0 @@
-package bytesbufferstring
-
-import "bytes"
-
-func overlapBufferString(buf bytes.Buffer) string {
-	return string( /* keep */ buf.Bytes()) // want `string\(buf\.Bytes\(\)\) can be simplified to buf\.String\(\)`
-}
