@@ -1,0 +1,87 @@
+name: Matched maintenance review
+on:
+  push:
+    branches: [matched-pr-controller-01]
+permissions:
+  contents: read
+jobs:
+  prepare:
+    if: github.repository == 'mohanad-hafez/gh-aw-controller'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    permissions:
+      contents: read
+      copilot-requests: write
+      actions: read
+      issues: read
+      pull-requests: read
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [agent, script]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install Copilot
+        if: matrix.arm == 'agent'
+        run: npm install --global @github/copilot@1.0.108
+      - name: Prepare the maintenance decision
+        env:
+          ARM: ${{ matrix.arm }}
+          GITHUB_TOKEN: ${{ matrix.arm == 'agent' && github.token || '' }}
+          PREFILTER_TOKEN: ${{ github.token }}
+        run: |
+          mkdir evidence
+          GH_TOKEN="$PREFILTER_TOKEN" node .github/matched/controller-arm.mjs prepare
+          unset PREFILTER_TOKEN
+          if [ "$ARM" = agent ]; then
+            node -e 'const c=process.cwd(),m=c+"/.github/matched";console.log(JSON.stringify({mcpServers:{fixture:{type:"local",command:"node",args:[m+"/component_fixture.cjs",c+"/evidence/fixture.json",c+"/evidence/tools.jsonl"],tools:["*"]}}}))' > fixture-mcp.json
+            timeout 180s copilot --disable-builtin-mcps --disable-client-telemetry \
+              --additional-mcp-config=@fixture-mcp.json \
+              --available-tools=fixture-read_input,fixture-publish_result \
+              --allow-tool=fixture --no-ask-user --no-color --silent \
+              --prompt "$(cat .github/matched/controller-prompt.md)" > evidence/output.txt 2> evidence/diagnostics.txt
+          fi
+          node .github/matched/controller-arm.mjs decide
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: controller-${{ matrix.arm }}
+          path: evidence/
+          retention-days: 14
+  publish:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      issues: write
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [agent, script]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: controller-${{ matrix.arm }}
+          path: evidence
+      - name: Apply the maintenance decision
+        env:
+          ARM: ${{ matrix.arm }}
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/matched/controller-arm.mjs publish
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: publication-controller-${{ matrix.arm }}
+          path: |
+            publication.json
+            operations.json
+            controller.json
+          retention-days: 14
