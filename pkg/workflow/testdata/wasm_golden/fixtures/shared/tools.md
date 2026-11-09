@@ -1,5 +1,0 @@
----
-tools:
-  bash: true
-  edit:
----

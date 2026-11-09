@@ -1,7 +1,0 @@
-package sprintfbool
-
-import "strconv"
-
-func singleUseSprintfBool(b bool) string {
-	return strconv.FormatBool(b) // want `use strconv\.FormatBool\(b\) instead of fmt\.Sprintf\("%t", b\)`
-}

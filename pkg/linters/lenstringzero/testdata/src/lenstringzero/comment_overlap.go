@@ -1,5 +1,0 @@
-package lenstringzero
-
-func overlapLenStringZero(s string) bool {
-	return len( /* keep */ s) == 0 // want `use s == "" to check for empty string instead of len\(s\) == 0`
-}

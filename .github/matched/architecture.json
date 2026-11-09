@@ -1,0 +1,47 @@
+{
+  "inputs": {
+    "metrics": {
+      "noop": false,
+      "thresholds": {
+        "file_lines_blocker": 2000,
+        "file_lines_warning": 1000,
+        "function_lines": 200,
+        "max_exports": 10
+      },
+      "files": [
+        {
+          "file": "actions/setup/js/create_issue.cjs",
+          "lines": 1494,
+          "export_count": 1,
+          "func_data": "113:function getIssueArrayLimitError(labels, assignees) {\n275:function createParentIssueTemplate(groupId, titlePrefix, workflowName, workflowSourceURL, expiresHours = 0) {\n314:function normalizeIssueFields(fields) {\n442:function buildIssueFieldMutationInput(requestedFields, availableFields) {\n510:function resolveBlockedByReference(value, temporaryIdMap, defaultRepo, allowUnresolvedTemporaryIds = false) {\n549:function resolveBlockedByReferences(blockedBy, temporaryIdMap, defaultRepo, allowUnresolvedTemporaryIds = false) {",
+          "export_names": "1492:module.exports = { main, createIssue, createParentIssueTemplate, searchForExistingParent, getSubIssueCount, ISSUE_FIELDS_QUERY };"
+        },
+        {
+          "file": "scripts/architecture_collect.mjs",
+          "lines": 38,
+          "export_count": 0,
+          "func_data": "20:for (const f of metrics.files) {",
+          "export_names": ""
+        },
+        {
+          "file": "scripts/architecture_report.mjs",
+          "lines": 145,
+          "export_count": 5,
+          "func_data": "2:export const prefix = \"[architecture-guardian] \";\n8:export function classifyArchitecture(metrics) {\n34:export function buildArchitectureReport(metrics, date) {",
+          "export_names": "2:export const prefix = \"[architecture-guardian] \";\n3:export async function findExistingArchitecture({ github, context }) {\n8:export function classifyArchitecture(metrics) {\n34:export function buildArchitectureReport(metrics, date) {\n56:export async function publishArchitecture({ github, context, metrics }) {"
+        },
+        {
+          "file": "scripts/architecture_report.test.mjs",
+          "lines": 42,
+          "export_count": 0,
+          "func_data": "",
+          "export_names": ""
+        }
+      ],
+      "import_cycles": ""
+    },
+    "date": "2026-11-07",
+    "open_reports": []
+  },
+  "output_description": "Submit only JSON with blockers, warnings and infos arrays. For an oversized file include kind file, file, value and limit."
+}
