@@ -1,0 +1,28 @@
+name: Review fixture check
+on:
+  push:
+    branches: [matched-controller-review-setup-01]
+permissions:
+  contents: read
+jobs:
+  setup:
+    if: github.repository == 'mohanad-hafez/gh-aw-controller'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        with:
+          retries: 0
+          script: await require('./.github/matched/controller-fixtures.cjs')({ github, context })
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: review-fixtures
+          path: reviews.json
+          retention-days: 14
