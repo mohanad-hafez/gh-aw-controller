@@ -1,5 +1,0 @@
-package appendbytestring
-
-func overlapAppend(b []byte, s string) []byte {
-	return append(b, []byte( /* keep */ s)...) // want `append\(b, \[\]byte\(s\)\.\.\.\) can be simplified to append\(b, s\.\.\.\); the \[\]byte conversion is unnecessary`
-}
