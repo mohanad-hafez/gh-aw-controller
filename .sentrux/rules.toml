@@ -1,5 +1,0 @@
-[constraints]
-min_quality = 0.52
-max_coupling_score = 0.20
-max_cycles = 2
-no_god_files = true
