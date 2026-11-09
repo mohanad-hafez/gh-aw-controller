@@ -1,0 +1,37 @@
+{
+  "inputs": {
+    "summary": {
+      "runs_checked": 1,
+      "total_outcomes": 1,
+      "accepted": 1,
+      "rejected": 0,
+      "ignored": 0,
+      "pending": 0,
+      "noop": 0,
+      "acceptance_rate": 1,
+      "waste_rate": 0,
+      "noop_rate": 0,
+      "date": "2026-11-07"
+    },
+    "evaluations": [
+      {
+        "type": "add_comment",
+        "url": "https://github.com/mohanad-hafez/gh-aw-controller/issues/2#issuecomment-6710214297",
+        "repo": "mohanad-hafez/gh-aw-controller",
+        "result": "accepted",
+        "detail": "open",
+        "workflow": "Output reference",
+        "run_id": 42397432582,
+        "timestamp": "2026-11-07T16:53:52Z",
+        "event": "push",
+        "resolution_sec": null,
+        "pending_age_sec": null,
+        "review_comments": null,
+        "changed_files": null,
+        "additions": null,
+        "deletions": null
+      }
+    ]
+  },
+  "output_description": "Submit JSON with metrics, workflow, accepted, rejected, ignored, and pending. Metrics includes runs_checked, total_outcomes, accepted, rejected, ignored, pending, acceptance_rate, waste_rate. Use rate fractions."
+}

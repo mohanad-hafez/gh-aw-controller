@@ -1,7 +1,0 @@
-package stringreplaceminusone
-
-import "strings"
-
-func overlapReplaceMinusOne(s, old, new string) string {
-	return strings.Replace(s, old, new /* keep */, -1) // want `use strings\.ReplaceAll instead of strings\.Replace with n=-1`
-}
