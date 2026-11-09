@@ -1,0 +1,221 @@
+{
+  "inputs": {
+    "command": {
+      "exit_code": 0,
+      "only_publication_path": ".github/aw/actions-lock.json"
+    },
+    "pins_1": [
+      {
+        "action": "actions-ecosystem/action-add-labels",
+        "before": "30714c236270",
+        "after": "30714c236270",
+        "unresolved": []
+      },
+      {
+        "action": "actions/ai-inference",
+        "before": "77272525fa92",
+        "after": "690cce599853",
+        "unresolved": []
+      },
+      {
+        "action": "actions/attest-build-provenance",
+        "before": "d5f016d9557a",
+        "after": "ca29e881d5e8",
+        "unresolved": []
+      },
+      {
+        "action": "actions/cache",
+        "before": "3d28d1cfb25f",
+        "after": "bbf948fc82fd",
+        "unresolved": []
+      }
+    ],
+    "pins_2": [
+      {
+        "action": "actions/cache/restore",
+        "before": "c231f314ab84",
+        "after": "eb092ba19541",
+        "unresolved": []
+      },
+      {
+        "action": "actions/cache/save",
+        "before": "e4ac836deee7",
+        "after": "fde48370e512",
+        "unresolved": []
+      },
+      {
+        "action": "actions/checkout",
+        "before": "9e7882f0a0ca",
+        "after": "edaf83ad7aa0",
+        "unresolved": []
+      },
+      {
+        "action": "actions/create-github-app-token",
+        "before": "2f53d6fa4cea",
+        "after": "ea59df9523ac",
+        "unresolved": []
+      }
+    ],
+    "pins_3": [
+      {
+        "action": "actions/download-artifact",
+        "before": "a8cc17837424",
+        "after": "b7ac0b0a1407",
+        "unresolved": []
+      },
+      {
+        "action": "actions/github-script",
+        "before": "cdee9b26bcf5",
+        "after": "cdee9b26bcf5",
+        "unresolved": []
+      },
+      {
+        "action": "actions/setup-dotnet",
+        "before": "fbe8755e85c8",
+        "after": "708bf1842f9c",
+        "unresolved": []
+      },
+      {
+        "action": "actions/setup-go",
+        "before": "ff53afe2b20c",
+        "after": "085bd535a520",
+        "unresolved": []
+      }
+    ],
+    "pins_4": [
+      {
+        "action": "actions/setup-java",
+        "before": "052845e1a236",
+        "after": "aa871f4b3c2d",
+        "unresolved": []
+      },
+      {
+        "action": "actions/setup-node",
+        "before": "7c0e7905c192",
+        "after": "427b0e467a57",
+        "unresolved": []
+      },
+      {
+        "action": "actions/setup-python",
+        "before": "417d2764bacc",
+        "after": "33ccc3d00408",
+        "unresolved": []
+      },
+      {
+        "action": "actions/upload-artifact",
+        "before": "80af214feae3",
+        "after": "10c50ed3830f",
+        "unresolved": []
+      }
+    ],
+    "pins_5": [
+      {
+        "action": "anchore/sbom-action",
+        "before": "9dac3c1bfe42",
+        "after": "0cd4f2d209ea",
+        "unresolved": []
+      },
+      {
+        "action": "astral-sh/setup-uv",
+        "before": "97de572cd639",
+        "after": "5e312ceb96eb",
+        "unresolved": []
+      },
+      {
+        "action": "cli/gh-extension-precompile",
+        "before": "207639f71bce",
+        "after": "73d6010a68cc",
+        "unresolved": []
+      },
+      {
+        "action": "denoland/setup-deno",
+        "before": "11180a2fc73b",
+        "after": "4f73281a4f4e",
+        "unresolved": []
+      }
+    ],
+    "pins_6": [
+      {
+        "action": "docker/build-push-action",
+        "before": "e7680ad23385",
+        "after": "7ad671b52ee5",
+        "unresolved": []
+      },
+      {
+        "action": "docker/login-action",
+        "before": "db1af657bd80",
+        "after": "719404cd45e0",
+        "unresolved": [
+          "docker/login-action@v4.8.0"
+        ]
+      },
+      {
+        "action": "docker/metadata-action",
+        "before": "8a8e7e78abef",
+        "after": "7e4eb5982617",
+        "unresolved": []
+      },
+      {
+        "action": "docker/setup-buildx-action",
+        "before": "75a6fe18afd4",
+        "after": "4623894457a8",
+        "unresolved": []
+      }
+    ],
+    "pins_7": [
+      {
+        "action": "erlef/setup-beam",
+        "before": "61aaf4008d9a",
+        "after": "f169b4501b73",
+        "unresolved": []
+      },
+      {
+        "action": "github/codeql-action/upload-sarif",
+        "before": "09e0d45e08e9",
+        "after": "90cbcac8c865",
+        "unresolved": []
+      },
+      {
+        "action": "github/stale-repos",
+        "before": "6f47fa017448",
+        "after": "383056461ba6",
+        "unresolved": []
+      },
+      {
+        "action": "haskell-actions/setup",
+        "before": "6d905d644a0c",
+        "after": "718bdd983797",
+        "unresolved": []
+      }
+    ],
+    "pins_8": [
+      {
+        "action": "microsoft/apm-action",
+        "before": "6acb219b8d29",
+        "after": "158940d158c9",
+        "unresolved": []
+      },
+      {
+        "action": "oven-sh/setup-bun",
+        "before": "3088deace45a",
+        "after": "3088deace45a",
+        "unresolved": []
+      },
+      {
+        "action": "ruby/setup-ruby",
+        "before": "7b873310a2da",
+        "after": "504cdf8a5163",
+        "unresolved": [
+          "ruby/setup-ruby@v1.338.0"
+        ]
+      },
+      {
+        "action": "super-linter/super-linter",
+        "before": "957dfbde0c4a",
+        "after": "0bf30078617d",
+        "unresolved": []
+      }
+    ]
+  },
+  "output_description": "Submit changed action identifiers, unresolved pin keys, and the one permitted path."
+}
